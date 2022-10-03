@@ -1,6 +1,8 @@
 import numpy as np
 import torch
+import nn
+import nn.tensor
+import nn.modules
 #axis就是遍历该轴上的所有元素
-p=0.3
-ll=np.array(np.random.binomial(1,1,(3,3)))
-print(ll)
+if  __name__ == '__main__':
+    torch.nn.Softmax

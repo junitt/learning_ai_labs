@@ -112,7 +112,12 @@ class BatchNorm1d(Module):
 
         # TODO Initialize the attributes
         # of 1d batchnorm module.
-
+        self.last_mean=np.zeros((length,))
+        self.last_var=np.zeros((length,))
+        self.momentum=momentum
+        self.eps=1e-5
+        self.gamma=tensor.ones((length,))
+        self.beta=tensor.zeros((length,))
         ...
 
         # End of todo
@@ -128,7 +133,15 @@ class BatchNorm1d(Module):
 
         # TODO Implement forward propogation
         # of 1d batchnorm module.
-
+        if self.training:
+            self.mean=np.mean(x,axis=0)
+            self.var=np.var(x,axis=0)
+            self.last_mean=self.momentum*self.last_mean+(1-self.momentum)*self.mean
+            self.last_var=self.momentum*self.last_var+(1-self.momentum)*self.var
+            self.x=(x-self.last_mean)/np.sqrt(self.last_var+self.eps)
+        else:
+            self.x=(x-self.last_mean)/np.sqrt(self.last_var+self.eps)
+        return self.gamma*self.x+self.beta
         ...
 
         # End of todo
@@ -144,7 +157,12 @@ class BatchNorm1d(Module):
 
         # TODO Implement backward propogation
         # of 1d batchnorm module.
-
+        self.gamma.grad=np.sum(self.x*dy,axis=0)
+        self.beta.grad=np.sum(dy,axis=0)
+        N=dy.shape[0]
+        dy*=self.gamma
+        dx=N*dy-np.sum(dy,axis=0)-self.x*np.sum(dy*self.x,axis=0)
+        return dx/np.sqrt(self.var + self.eps)
         ...
 
         # End of todo
