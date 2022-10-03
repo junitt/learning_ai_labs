@@ -144,14 +144,23 @@ class SoftmaxLoss(Loss):
         # TODO Calculate softmax loss.
         
         ...
-
+        self.probs = probs
+        self.targets = targets
+        temp=np.exp(probs)
+        probs=temp/np.sum(temp,axis=1,keepdims=True)
+        fac=np.zeros(self.n_classes)
+        fac[targets]=1
+        self.value=np.sum(-fac*np.log(probs))
+        return self
         # End of todo
 
     def backward(self):
 
         # TODO Implement backward propogation
         # of softmax loss function.
-
+        fac=np.zeros(self.n_classes)
+        fac[self.targets]=1
+        return self.probs-fac
         ...
 
         # End of todo

@@ -24,8 +24,9 @@ class Model(nn.Module):
 
 
 def load_mnist(mode='train', n_samples=None, flatten=True):
-    images = './train-images-idx3-ubyte' if mode == 'train' else './t10k-images-idx3-ubyte'
-    labels = './train-labels-idx1-ubyte' if mode == 'train' else './t10k-labels-idx1-ubyte'
+    labels=images='dataset'
+    images += './train-images.idx3-ubyte' if mode == 'train' else './t10k-images.idx3-ubyte'
+    labels += './train-labels.idx1-ubyte' if mode == 'train' else './t10k-labels.idx1-ubyte'
     length = 60000 if mode == 'train' else 10000
 
     X = np.fromfile(open(images), np.uint8)[16:].reshape(
