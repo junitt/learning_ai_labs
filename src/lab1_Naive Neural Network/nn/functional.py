@@ -10,10 +10,10 @@ class Sigmoid(Module):
         # of sigmoid function.
         self.x=x
         ret=np.zeros(x.shape)
-        self.x=x
         for i in range(x.shape[0]):
             for j in range(x.shape[1]):
                 ret[i][j]=math.exp(x[i][j])/(math.exp(x[i][j])+1)
+        self.f=ret
         return ret
         ...
 
@@ -23,12 +23,7 @@ class Sigmoid(Module):
 
         # TODO Implement backward propogation
         # of sigmoid function.
-        x=self.x
-        ret=np.zeros(x.shape)
-        for i in range(x.shape[0]):
-            for j in range(x.shape[1]):
-                ret[i][j]=dy[i][j]*math.exp(x[i][j])/(math.exp(x[i][j])+1)*(1-math.exp(x[i][j])/(math.exp(x[i][j])+1))
-        return ret
+        return dy*self.f*(1-self.f)
         ...
 
         # End of todo
@@ -62,13 +57,8 @@ class ReLU(Module):
 
         # TODO Implement forward propogation
         # of ReLU function.
-        ret=np.zeros(x.shape)
         self.x=x
-        for i in range(x.shape[0]):
-            for j in range(x.shape[1]):
-                if(x[i][j]>0):
-                    ret[i][j]=x[i][j]
-        return ret
+        return np.maximum(x, 0)
         ...
 
         # End of todo
@@ -77,14 +67,7 @@ class ReLU(Module):
 
         # TODO Implement backward propogation
         # of ReLU function.
-        x=self.x
-        ret=np.zeros(x.shape)
-        
-        for i in range(x.shape[0]):
-            for j in range(x.shape[1]):
-                if(x[i][j]>0):
-                    ret[i][j]=dy[i][j]
-        return ret
+        return np.where(self.x>0,dy,0)
         ...
 
         # End of todo
@@ -97,17 +80,15 @@ class Softmax(Module):
         # TODO Implement forward propogation
         # of Softmax function.
         self.x=x
-        dn=np.ones(x.shape)
-        val=np.sum(np.exp(x),axis=1)
-        for i in range(x.shape[0]):
-            dn[i]=dn[i]*val[i]
-        return np.exp(x)/dn
+        #dn=np.ones(x.shape)
+        val=np.sum(np.exp(x),axis=1,keepdims=True)
+        return np.exp(x)/val
         ...
 
         # End of todo
 
     def backward(self, dy):
-
+        return dy
         # Omitted.
         ...
 
@@ -144,6 +125,7 @@ class SoftmaxLoss(Loss):
         # TODO Calculate softmax loss.
         
         ...
+        
         self.probs = probs
         self.targets = targets
         temp=np.exp(probs)
@@ -158,6 +140,7 @@ class SoftmaxLoss(Loss):
 
         # TODO Implement backward propogation
         # of softmax loss function.
+        
         fac=np.zeros(self.n_classes)
         fac[self.targets]=1
         return self.probs-fac
@@ -171,6 +154,12 @@ class CrossEntropyLoss(Loss):
     def __call__(self, probs, targets):
 
         # TODO Calculate cross-entropy loss.
+        #val=np.sum(np.exp(probs),axis=1,keepdims=True)
+        #np.exp(probs)/val
+        self.probs=probs
+        self.targets=targets
+        self.value=np.mean(-np.eye(self.n_classes)[targets]*np.log(probs))
+        return self
 
         ...
 
@@ -180,7 +169,10 @@ class CrossEntropyLoss(Loss):
 
         # TODO Implement backward propogation
         # of cross-entropy loss function.
-
+        batch_size = self.probs.shape[0]
+        class_num = self.n_classes
+        target = np.eye(class_num)[self.targets]
+        return (-(target - self.probs) / batch_size)
         ...
 
         # End of todo

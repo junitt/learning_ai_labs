@@ -103,7 +103,6 @@ class BatchNorm1d(Module):
 
     def __init__(self, length: int, momentum: float=0.9):
         """Module which applies batch normalization to input.
-
         Args:
             length: L from expected input shape (N, L).
             momentum: default 0.9.
@@ -118,13 +117,11 @@ class BatchNorm1d(Module):
         self.eps=1e-5
         self.gamma=tensor.ones((length,))
         self.beta=tensor.zeros((length,))
-        ...
 
         # End of todo
 
     def forward(self, x):
         """Forward propagation of batch norm module.
-
         Args:
             x: input of shape (N, L).
         Returns:
@@ -133,16 +130,16 @@ class BatchNorm1d(Module):
 
         # TODO Implement forward propogation
         # of 1d batchnorm module.
+
         if self.training:
             self.mean=np.mean(x,axis=0)
             self.var=np.var(x,axis=0)
             self.last_mean=self.momentum*self.last_mean+(1-self.momentum)*self.mean
             self.last_var=self.momentum*self.last_var+(1-self.momentum)*self.var
-            self.x=(x-self.last_mean)/np.sqrt(self.last_var+self.eps)
+            self.x=(x-self.mean)/np.sqrt(self.var+self.eps)
         else:
             self.x=(x-self.last_mean)/np.sqrt(self.last_var+self.eps)
-        return self.gamma*self.x+self.beta
-        ...
+        return self.beta+self.x*self.gamma
 
         # End of todo
 
@@ -162,8 +159,7 @@ class BatchNorm1d(Module):
         N=dy.shape[0]
         dy*=self.gamma
         dx=N*dy-np.sum(dy,axis=0)-self.x*np.sum(dy*self.x,axis=0)
-        return dx/np.sqrt(self.var + self.eps)
-        ...
+        return dx/N/np.sqrt(self.var+self.eps)
 
         # End of todo
 

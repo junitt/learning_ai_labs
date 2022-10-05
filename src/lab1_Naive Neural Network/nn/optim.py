@@ -1,6 +1,6 @@
 from .tensor import Tensor
 from .modules import Module
-
+import math
 
 class Optim(object):
 
@@ -44,6 +44,8 @@ class SGD(Optim):
 
         # TODO Update the weight of tensor
         # in SGD manner.
+        tensor.v=self.momentum*tensor.v+self.lr*tensor.grad if 'v' in vars(tensor) else self.lr * tensor.grad
+        tensor-=tensor.v
 
         ...
 
@@ -57,7 +59,9 @@ class Adam(Optim):
 
         # TODO Initialize the attributes
         # of Adam optimizer.
-
+        self.betas=(0.9, 0.999)
+        self.eps=1e-8,
+        self.weight_decay=0,
         ...
 
         # End of todo
@@ -66,7 +70,7 @@ class Adam(Optim):
 
         # TODO Update the weight of
         # tensor in Adam manner.
-
+        
         ...
 
         # End of todo

@@ -1,14 +1,16 @@
+from turtle import forward
 import numpy as np
 from matplotlib import pyplot as plt
+from torch import sigmoid
 from tqdm import tqdm
-
+import cv2
 import nn
 import nn.functional as F
 
 
 n_features = 28 * 28
 n_classes = 10
-n_epochs = 10
+n_epochs = 1600
 bs = 1000
 lr = 1e-3
 lengths = (n_features, 512, n_classes)
@@ -17,7 +19,25 @@ lengths = (n_features, 512, n_classes)
 class Model(nn.Module):
 
     # TODO Design the classifier.
+    def __init__(self,lengths):
+        self.layers=[]
+        for i in range(len(lengths)-1):
+            self.layers.append(nn.Linear(lengths[i],lengths[i+1]))
+            self.layers.append(nn.BatchNorm1d(lengths[i+1]))
+            if(i!=len(lengths)-2):
+                self.layers.append(F.ReLU())
+            else:
+                self.layers.append(F.Softmax())
 
+    def forward(self,x):
+        for layer in self.layers:
+            x=layer.forward(x)
+        return x
+
+    def backward(self,dy):
+        for layer in reversed(self.layers):
+            dy=layer.backward(dy)
+        return dy
     ...
 
     # End of todo
@@ -35,6 +55,9 @@ def load_mnist(mode='train', n_samples=None, flatten=True):
         X = X.reshape(length, -1)
     y = np.fromfile(open(labels), np.uint8)[8:].reshape(
         (length)).astype(np.int32)
+    threshold, upper, lower = 20,255,0
+    X[X>threshold] = upper
+    X[X<=threshold] = lower
     return (X[:n_samples] if n_samples is not None else X,
             y[:n_samples] if n_samples is not None else y)
 
