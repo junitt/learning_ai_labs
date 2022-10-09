@@ -32,8 +32,6 @@ class TvidDataset(data.Dataset):
         samp=self.samples[idx]
         image, label=self.transforms(samp['path'],samp['bbox'])
         return image,{'cls':samp['cls'],'box':label }
-
-
     ...
 
     # End of todo
