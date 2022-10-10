@@ -11,7 +11,7 @@ class TvidDataset(data.Dataset):
     def __init__(self, root, mode):
         self.samples=[]
         self.classes=['bird','car','dog','lizard','turtle']
-        lst=[transforms.LoadImage(),transforms.ToTensor()]
+        lst=[transforms.LoadImage(),transforms.ToTensor(),transforms.Normalize(mean=(0.5,0.5,0.5),std=(0.4,0.4,0.4))]
         self.transforms=transforms.Compose(lst)
         for i in range(len(self.classes)):
             imgs=os.path.join(root,self.classes[i])
@@ -23,7 +23,7 @@ class TvidDataset(data.Dataset):
                         break
                     elif mode=='test'and int(id)<=150:
                         continue
-                    elif int(id)>180:
+                    if int(id)>180:
                         break
                     self.samples.append({'path':os.path.join(imgs,'%06d.JPEG'%int(id)),'cls':i,'bbox':[int(num) for num in parm]})
     def __len__(self):
